@@ -12,7 +12,7 @@
 
 + <a href=https://scguoi.github.io/DivisionByZero/2016/11/15/GO语言RPC方案调研.html#3-对比测试>Go语言rpc方案调研</a>
   + 包含了三种框架的简单demo以及三种框架的特点对比以及性能对比
-  + ![对比测试](image\对比测试.png)
+  + ![对比测试](image/对比测试.png)
 
 + <a href= https://colobu.com/2016/09/05/benchmarks-of-popular-rpc-frameworks/>分布式rpc框架性能对比</a>
   + 本文时间较早，参考性未知
