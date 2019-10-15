@@ -1,0 +1,31 @@
+# 功能测试
+
+# 集成测试
+
+# 性能测试
+
+## ghz工具
+
+### ghz简介
+
+ghz是一款用于grpc服务的基准测试和负载测试的工具，既可以作为命令行工具使用，也可以作为go package以编程方式进行性能测试。
+
+项目github地址：https://github.com/bojand/ghz
+
+如果作为命令行工具使用，ghz提供了编译好的release版本以供使用。
+
+### ghz测试优点
+
+* 可以根据proto文件、编译好的proto文件、服务器反射等方式自动进行请求
+* 可以生成各种格式的报告，包括命令行、csv、json、html、influxdata
+* 测试使用的数据可以根据go template或者json file或者二进制文件进行读取
+* 
+
+## 使用ghz工具进行性能测试
+
+
+
+
+
+# 测试撰写规范
+
