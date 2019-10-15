@@ -10,4 +10,9 @@
 
   * Is it necessary to build a repo for different rpc Apis?
   * a repo for storing rpc apis for shannonai shall be built.
+  * but the version control could be difficult
+  
+* multiple rpc server in a process?
+
+* 
 

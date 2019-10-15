@@ -1,6 +1,6 @@
 # 功能测试
 
-# 集成测试
+
 
 # 性能测试
 
@@ -19,13 +19,122 @@ ghz是一款用于grpc服务的基准测试和负载测试的工具，既可以�
 * 可以根据proto文件、编译好的proto文件、服务器反射等方式自动进行请求
 * 可以生成各种格式的报告，包括命令行、csv、json、html、influxdata
 * 测试使用的数据可以根据go template或者json file或者二进制文件进行读取
-* 
 
-## 使用ghz工具进行性能测试
+## 使用ghz工具对grpc服务进行性能测试
 
+### 准备工作
 
+grpc服务对应的proto文件 
 
+### 基本选项
 
+本部分摘选了一些基本参数进行介绍,详细参数见项目主页.
+
+```
+usage: ghz [<flags>] [<host>]
+
+测试必需的参数:
+      --proto=               指定proto文件
+      --call=                指定需要测试的grpc服务的method
+  -i, --import-paths=        指定proto的import文件位置
+      --insecure             使用不安全的连接
+      
+测试输入数据参数:(至少一个)      
+  -d, --data=                请求使用的数据,格式为json字符串.当值为@时候,从命令行读入
+  -D, --data-file=           请求使用的json文件
+  -b, --binary               请求所使用的数据(二进制信息)
+  -B, --binary-file=         请求所使用的文件(二进制数据)
+
+测试强度相关的参数:(可以不设置)
+  -c, --concurrency=50       测试端使用线程数量, 默认50
+  -n, --total=200            测试端测试次数,默认200
+  -q, --qps=0                测试端请求qps限制,默认无
+  -t, --timeout=20s          每次请求超时时间,默认20s
+  -z, --duration=0           忽略-n选项的测试持续时间 eg. 10s 15m, 默认无
+  -x, --max-duration=0       保留-n选项的测试最大持续时间 eg. 10s 15m, 默认无
+      --connections=1        测试段使用客户端的数量(对于每一个server实例建立的tcp链接数量),默认1
+  
+测试生成报告相关参数:(各种报告的效果图见附录1,默认summary)
+  -o, --output=              测试报告生成位置,默认是stdout
+  -O, --format=              测试报告格式: summary, csv, json, pretty, html, influx-summary, influx-details. 默认summary
+  --cpus=12                  使用CPU数量
+  -v, --version              Show application version.
+```
+
+### 测试案例
+
+#### 案例1	简单一元请求
+
+```
+ghz --insecure \
+  --proto ./greeter.proto \
+  --call helloworld.Greeter.SayHello \
+  -d '{"name":"Joe"}' \
+  0.0.0.0:50051
+```
+
+#### 案例2	简单一元请求	数据轮询
+
+每次发送的数据在-d传入的数组内进行轮换.
+
+```
+ghz --insecure \
+  --proto ./greeter.proto \
+  --call helloworld.Greeter.SayHello \
+  -d '[{"name":"Joe"},{"name":"Bob"}]' \
+  0.0.0.0:50051
+```
+
+#### 案例3	客户端流式请求
+
+使用数据轮询的一元请求和流式请求的-d均可以指定一个数组,区别在于一元请求每次发送数组中的一个元素,流式请求将整个数组看做一个stream所需传递的数据.
+
+```
+ghz --proto ./greeter.proto \
+  --call helloworld.Greeter.SayHelloCS \
+  -d '[{"name":"Joe"},{"name":"Kate"},{"name":"Sara"}]' \
+  0.0.0.0:50051
+```
+
+#### 案例4	设置请求强度相关参数
+
+使用10个客户端,共20个线程,共进行2000次请求.
+
+```
+ghz --proto ./greeter.proto \
+  --call helloworld.Greeter.SayHello \
+  -d '{"name":"Joe"}' \
+  -n 2000 \
+  -c 20 \
+  --connections=10 \
+  0.0.0.0:50051
+```
+
+#### 案例5	指定输出格式
+
+使用-o指定输出文件名字,-O选项指定report输出格式. 可选:summary, csv, json, pretty, html, influx-summary, influx-details.效果图见附录1.
+
+```
+ghz --insecure \
+  --proto ./greeter.proto \
+  --call helloworld.Greeter.SayHello \
+  -d '{"name":"Joe"}' \
+  -o ./report.html \
+  -O html
+  0.0.0.0:50051
+```
 
 # 测试撰写规范
+
+# 附录
+
+## 附录1	ghz测试报告效果图
+
+### summary
+
+![ghz](https://ghz.sh/img/ghz_cobalt_plain.png)
+
+#### html
+
+![](https://ghz.sh/img/project_detail_page.png)
 
