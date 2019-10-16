@@ -71,6 +71,63 @@ go install github.com/fullstorydev/grpcurl/cmd/grpcurl
 
 ### 使用
 
+#### 常用参数
+
+```
+Usage:
+	grpcurl [flags] [address] [list|describe] [symbol]
+
+Available flags:
+
+  -d string
+  		指定请求数据,如果值为@,那么打开交互式命令,可以用于进行客户端流式请求.
+  -import-path value
+  		proto文件中import的文件
+  -insecure
+  		跳过认证.
+  -plaintext
+    	忽略tls
+  -proto value
+    	指定proto文件
+```
+
+### 使用案例
+
+#### 案例1	一元请求
+
+```
+grpcurl -plaintext \
+-proto strings.proto \
+-d '{"str":"hello"}' \
+localhost:50051 \
+shannonai.readygo_ecosystem.strings.StringsUtil/Kaptalize
+```
+
+#### 案例2	客户端流式请求
+
+```
+grpcurl -plaintext \
+-proto strings.proto \
+-d @ \
+localhost:50051 \
+shannonai.readygo_ecosystem.strings.StringsUtil/Reverse
+```
+
+以下是命令行交互内容:
+
+其中两个hello是请求,两个olleh是响应
+
+```
+{"str":"hello"}
+{
+  "str": "olleh"
+}
+{"str":"hello"}
+{
+  "str": "olleh"
+}
+```
+
 
 
 
