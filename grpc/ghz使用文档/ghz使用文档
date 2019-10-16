@@ -1,5 +1,80 @@
 # 功能测试
 
+## 测试工具
+
+### 测试工具 or 代码
+
+//todo
+
+### 常见测试工具
+
+对于可用的功能测试的工具，大致分为cli和gui两种
+
+#### cli：
+
+* [polyglot](https://github.com/grpc-ecosystem/polyglot) - java
+* [grpcc](https://github.com/njpatel/grpcc) - Node
+* [gcall](https://github.com/bojand/gcall) - Node
+* [Evans](https://github.com/ktr0731/evans) - go 最方便，命令简介，简易可视化
+* [grpcurl](https://github.com/fullstorydev/grpcurl) - go 最经典的一款
+
+推荐使用evans或者grpcurl
+
+#### gui：
+
+- [letmegrpc](https://github.com/gogo/letmegrpc)
+- [omgRPC](https://github.com/troylelandshields/omgrpc)  (Deprecated)
+- [grpcui](https://github.com/fullstorydev/grpcui) 
+- [BloomRPC](https://github.com/uw-labs/bloomrpc) 
+- [gRPCox](https://github.com/gusaul/grpcox)
+- [MuninRPC](https://github.com/muninrpc/muninrpc)
+- [Delivery](https://github.com/kfwerf/delivery)
+
+推荐使用BloomRPC，界面简洁，操作简单。
+
+## BloomRPC
+
+[github项目地址](https://github.com/uw-labs/bloomrpc)
+
+### 安装
+
+支持各种主流系统，Ubuntu系统直接下载deb文件进行安装。
+
+### 使用
+
+由于直接使用deb安装
+
+使用方式如图：
+
+
+
+## grpcurl
+
+[github项目地址](https://github.com/fullstorydev/grpcurl)
+
+### 简介
+
+grpcurl可以当成针对grpc服务的curl工具。
+
+* 支持各种类型rpc方法，可以通过命令行交互的方式进行流式请求的操作。
+* 支持服务器反射、也支持proto文件 （获取service信息的方式）
+* 支持plain-text和TLS服务
+
+### 安装
+
+可以使用go tool安装：
+
+```
+go get github.com/fullstorydev/grpcurl
+go install github.com/fullstorydev/grpcurl/cmd/grpcurl
+```
+
+### 使用
+
+
+
+
+
 
 
 # 性能测试
@@ -20,7 +95,7 @@ ghz是一款用于grpc服务的基准测试和负载测试的工具，既可以�
 * 可以生成各种格式的报告，包括命令行、csv、json、html、influxdata
 * 测试使用的数据可以根据go template或者json file或者二进制文件进行读取
 
-## 使用ghz工具对grpc服务进行性能测试
+## ghz使用
 
 ### 准备工作
 
@@ -35,7 +110,7 @@ usage: ghz [<flags>] [<host>]
 
 测试必需的参数:
       --proto=               指定proto文件
-      --call=                指定需要测试的grpc服务的method
+      --call=                指定需要测试的grpc服务的method,格式一般为package.service.method
   -i, --import-paths=        指定proto的import文件位置
       --insecure             使用不安全的连接
       
@@ -68,8 +143,8 @@ usage: ghz [<flags>] [<host>]
 ```
 ghz --insecure \
   --proto ./greeter.proto \
-  --call helloworld.Greeter.SayHello \
-  -d '{"name":"Joe"}' \
+  --call shannonai.readygo_ecosystem.strings.StringsUtil.Kaptalize \
+  -d '{"str":"hello"}' \
   0.0.0.0:50051
 ```
 
@@ -80,8 +155,8 @@ ghz --insecure \
 ```
 ghz --insecure \
   --proto ./greeter.proto \
-  --call helloworld.Greeter.SayHello \
-  -d '[{"name":"Joe"},{"name":"Bob"}]' \
+  --call shannonai.readygo_ecosystem.strings.StringsUtil.Kaptalize \
+  -d '[{"str":"hello"},{"name":"world"}]' \
   0.0.0.0:50051
 ```
 
@@ -91,8 +166,8 @@ ghz --insecure \
 
 ```
 ghz --proto ./greeter.proto \
-  --call helloworld.Greeter.SayHelloCS \
-  -d '[{"name":"Joe"},{"name":"Kate"},{"name":"Sara"}]' \
+  --call shannonai.readygo_ecosystem.strings.StringsUtil.Reverse \
+  -d '[{"str":"Joe"},{"str":"Kate"},{"str":"Sara"}]' \
   0.0.0.0:50051
 ```
 
@@ -102,8 +177,8 @@ ghz --proto ./greeter.proto \
 
 ```
 ghz --proto ./greeter.proto \
-  --call helloworld.Greeter.SayHello \
-  -d '{"name":"Joe"}' \
+  --call shannonai.readygo_ecosystem.strings.StringsUtil.Kaptalize \
+  -d '{"str":"hello"}' \
   -n 2000 \
   -c 20 \
   --connections=10 \
@@ -117,24 +192,90 @@ ghz --proto ./greeter.proto \
 ```
 ghz --insecure \
   --proto ./greeter.proto \
-  --call helloworld.Greeter.SayHello \
-  -d '{"name":"Joe"}' \
+  --call shannonai.readygo_ecosystem.strings.StringsUtil.Kaptalize \
+  -d '{"str":"hello"}' \
   -o ./report.html \
   -O html
   0.0.0.0:50051
 ```
 
+## ghz-web工具
+
+### 简介
+
+ghz-web是一个web应用，它可以保存ghz生成的测试报告，并可以对报告进行可视化。
+
+ghz生成的测试报告可以通过http POST传送给ghz-web，之后会被保存到ghz-web本地的数据库中。ghz-web仅仅支持json格式的报告，仅仅支持sqlite3、mysql、postgres.
+
+### 安装
+
+如果使用sqlite3，那么官方提供的release版本的二进制文件可能无法使用，需要自己从源码编译并且设置CGO_ENABLED=1。
+
+### 使用
+
+#### 1. 准备配置文件
+
+config.yaml
+
+```yaml
+---
+server:
+  port: 3000    # the port for the http server
+database:       # the database options
+  type: sqlite3
+  connection: data/ghz.db
+log:
+  level: info
+  path: /tmp/ghz.log # the path to log file, otherwize stdout is used
+```
+
+#### 2. 启动服务器
+
+```
+ghz-web -config config.yaml
+```
+
+#### 3. 创建工程
+
+登录localhost:3000, 点击界面上的new按钮，输入工程名字即可创建工程。
+
+#### 4.测试结束的报告发送到ghz-web下的工程内
+
+```cmd
+ghz --insecure \
+    --proto ./greeter.proto \
+    --call shannonai.readygo_ecosystem.strings.StringsUtil.Kaptalize \
+    -d '{"str": "a"}' \
+    --tags '{"env": "staging", "created by":"huang lei"}' \
+    -O json \
+    0.0.0.0:50051 | http POST localhost:3000/api/projects/34/ingest
+```
+
+注释：对于不同的工程，最后一行仅需更改/api/projects/:id/ingest中的id，其余无需改变。
+
+#### 5.结果查看
+
+见附录一
+
+
+
 # 测试撰写规范
+
+
 
 # 附录
 
 ## 附录1	ghz测试报告效果图
 
-### summary
+### summary效果图
 
 ![ghz](https://ghz.sh/img/ghz_cobalt_plain.png)
 
-#### html
+#### html效果图
+
+#### ![ghz_html](C:\Users\HuangLei\Desktop\ghz_html.png)
+
+#### ghz-web效果图
 
 ![](https://ghz.sh/img/project_detail_page.png)
 
